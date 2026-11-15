@@ -1,0 +1,691 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        LeafCare AI - Leaf Disease Detection
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f8f4;
+            color: #1f2937;
+        }
+
+        /* ================================================= */
+        /* NAVBAR */
+        /* ================================================= */
+
+        .navbar {
+            background: #166534;
+            color: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .language-selector select {
+            padding: 7px;
+            border-radius: 6px;
+            border: none;
+        }
+
+
+        /* ================================================= */
+        /* HERO */
+        /* ================================================= */
+
+        .hero {
+            min-height: 360px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            background: #dcfce7;
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            color: #14532d;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 19px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #16a34a;
+            color: white;
+            padding: 13px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+
+        /* ================================================= */
+        /* PREDICTION */
+        /* ================================================= */
+
+        .prediction-section {
+            padding: 60px 7%;
+            text-align: center;
+        }
+
+        .prediction-section h2 {
+            font-size: 32px;
+            color: #166534;
+            margin-bottom: 10px;
+        }
+
+        .section-description {
+            margin-bottom: 30px;
+            color: #64748b;
+        }
+
+        .prediction-box {
+            max-width: 850px;
+            margin: auto;
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+
+        /* ================================================= */
+        /* UPLOAD */
+        /* ================================================= */
+
+        .upload-area {
+            margin-bottom: 20px;
+        }
+
+        .upload-area label {
+            display: inline-block;
+            padding: 13px 20px;
+            background: #166534;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+
+        /* ================================================= */
+        /* PREVIEW */
+        /* ================================================= */
+
+        .preview-container {
+            margin: 25px auto;
+            max-width: 400px;
+        }
+
+        #preview {
+            width: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            border-radius: 12px;
+            border: 2px solid #bbf7d0;
+        }
+
+
+        /* ================================================= */
+        /* BUTTON */
+        /* ================================================= */
+
+        .predict-btn {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        .predict-btn:hover {
+            background: #15803d;
+        }
+
+        .predict-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+
+        /* ================================================= */
+        /* LOADING */
+        /* ================================================= */
+
+        #loading {
+            margin: 20px;
+            color: #166534;
+            font-weight: bold;
+        }
+
+
+        /* ================================================= */
+        /* RESULT */
+        /* ================================================= */
+
+        .result {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .result-card {
+            background: #ecfdf5;
+            border-left: 6px solid #16a34a;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .result-card h2 {
+            margin-bottom: 15px;
+        }
+
+        .confidence {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+
+        /* ================================================= */
+        /* DISEASE INFO */
+        /* ================================================= */
+
+        .disease-info {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .disease-info > h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+
+        .info-card h3 {
+            color: #166534;
+            margin-bottom: 10px;
+        }
+
+        .info-card p {
+            line-height: 1.7;
+        }
+
+        .info-card ul {
+            padding-left: 25px;
+            line-height: 1.7;
+        }
+
+
+        /* ================================================= */
+        /* ABOUT */
+        /* ================================================= */
+
+        .about {
+            background: #ecfdf5;
+            padding: 60px 10%;
+            text-align: center;
+        }
+
+        .about h2 {
+            color: #166534;
+            margin-bottom: 20px;
+        }
+
+        .about p {
+            max-width: 850px;
+            margin: 10px auto;
+            line-height: 1.7;
+        }
+
+
+        /* ================================================= */
+        /* FOOTER */
+        /* ================================================= */
+
+        footer {
+            background: #14532d;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+
+        /* ================================================= */
+        /* MOBILE */
+        /* ================================================= */
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .prediction-box {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ===================================================== -->
+<!-- NAVBAR -->
+<!-- ===================================================== -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        🌿 LeafCare AI
+    </div>
+
+    <div class="nav-links">
+
+        <a href="#">
+            Home
+        </a>
+
+        <a href="#about">
+            About
+        </a>
+
+        <a href="#prediction">
+            Prediction
+        </a>
+
+        <div class="language-selector">
+
+            <label for="languageSelect">
+                🌐
+            </label>
+
+            <select id="languageSelect">
+
+                <option value="en">
+                    English
+                </option>
+
+                <option value="hi">
+                    हिन्दी
+                </option>
+
+                <option value="or">
+                    ଓଡ଼ିଆ
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- ===================================================== -->
+<!-- HERO -->
+<!-- ===================================================== -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            AI-Based Leaf Disease Detection
+        </h1>
+
+        <p>
+            Upload a plant leaf image and let our
+            AI system identify the predicted disease
+            and provide useful agricultural information.
+        </p>
+
+        <a href="#prediction"
+           class="btn">
+
+            Detect Disease
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- PREDICTION -->
+<!-- ===================================================== -->
+
+<section id="prediction"
+         class="prediction-section">
+
+    <h2>
+        🌱 Leaf Disease Prediction
+    </h2>
+
+    <p class="section-description">
+
+        Upload a clear leaf image.
+
+        Your CNN model will predict the PlantVillage class,
+        and Gemini will generate the disease information.
+
+    </p>
+
+
+    <div class="prediction-box">
+
+
+        <!-- IMAGE UPLOAD -->
+
+        <div class="upload-area">
+
+            <label for="imageInput">
+
+                📷 Select Leaf Image
+
+            </label>
+
+            <input
+                type="file"
+                id="imageInput"
+                name="image"
+                accept="image/*"
+            >
+
+        </div>
+
+
+        <!-- IMAGE PREVIEW -->
+
+        <div id="previewContainer"
+             class="preview-container"
+             style="display:none;">
+
+            <img
+                id="preview"
+                src=""
+                alt="Leaf Image Preview"
+            >
+
+        </div>
+
+
+        <!-- PREDICT BUTTON -->
+
+        <button
+            type="button"
+            id="predictButton"
+            class="predict-btn">
+
+            🔍 Predict Disease
+
+        </button>
+
+
+        <!-- LOADING -->
+
+        <div id="loading"
+             style="display:none;">
+
+            <p>
+                🔄 CNN is analyzing the image...
+            </p>
+
+            <p>
+                🤖 Gemini is generating disease information...
+            </p>
+
+        </div>
+
+
+        <!-- RESULT -->
+
+        <div
+            id="result"
+            class="result">
+        </div>
+
+
+        <!-- DISEASE INFORMATION -->
+
+        <div
+            id="diseaseInfo"
+            class="disease-info"
+            style="display:none;">
+
+            <h2>
+                🌿 Disease Information
+            </h2>
+
+
+            <!-- PLANT -->
+
+            <div class="info-card">
+
+                <h3>
+                    🌱 Plant
+                </h3>
+
+                <p id="plant">
+                    Information will appear here.
+                </p>
+
+            </div>
+
+
+            <!-- SYMPTOMS -->
+
+            <div class="info-card">
+
+                <h3>
+                    🔍 Symptoms
+                </h3>
+
+                <p id="symptoms">
+                    Information will appear here.
+                </p>
+
+            </div>
+
+
+            <!-- CAUSE -->
+
+            <div class="info-card">
+
+                <h3>
+                    🦠 Cause
+                </h3>
+
+                <p id="cause">
+                    Information will appear here.
+                </p>
+
+            </div>
+
+
+            <!-- TREATMENT -->
+
+            <div class="info-card">
+
+                <h3>
+                    💊 How to Treat
+                </h3>
+
+                <div id="treatment">
+                    Information will appear here.
+                </div>
+
+            </div>
+
+
+            <!-- PREVENTION -->
+
+            <div class="info-card">
+
+                <h3>
+                    🛡️ How to Protect / Prevent
+                </h3>
+
+                <div id="prevention">
+                    Information will appear here.
+                </div>
+
+            </div>
+
+
+            <!-- FARMER ADVICE -->
+
+            <div class="info-card">
+
+                <h3>
+                    👨‍🌾 Farmer Advice
+                </h3>
+
+                <p id="farmerAdvice">
+                    Information will appear here.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- ABOUT -->
+<!-- ===================================================== -->
+
+<section id="about"
+         class="about">
+
+    <h2>
+        About LeafCare AI
+    </h2>
+
+    <p>
+
+        LeafCare AI uses a trained deep learning
+        image-classification model to predict a
+        PlantVillage leaf-disease class.
+
+    </p>
+
+    <p>
+
+        Gemini is then used to generate understandable
+        information about the predicted class, including
+        symptoms, causes, treatment, prevention and
+        general farmer advice.
+
+    </p>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- FOOTER -->
+<!-- ===================================================== -->
+
+<footer>
+
+    <p>
+        © 2026 LeafCare AI |
+        AI-Based Leaf Disease Detection
+    </p>
+
+</footer>
+
+
+<!-- ===================================================== -->
+<!-- JAVASCRIPT -->
+<!-- ===================================================== -->
+
+<script
+    src="{{ url_for('static', filename='js/script.js') }}">
+</script>
+
+
+</body>
+
+</html>
+
